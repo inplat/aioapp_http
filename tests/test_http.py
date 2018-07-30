@@ -1,7 +1,7 @@
 import asyncio
 import pytest
 from aiohttp import web
-from aioapp_http import Server, Client, Handler
+from aioapp_http import Server, Client, Handler, HttpClientTracerConfig
 from aioapp.app import Application
 from aioapp.misc import async_call
 import aiozipkin.span as azs
@@ -52,7 +52,8 @@ async def test_server(app, unused_tcp_port):
     span = _create_span(app)
 
     resp = await app.client.post(span,
-                                 'http://127.0.0.1:%d/' % unused_tcp_port)
+                                 'http://127.0.0.1:%d/' % unused_tcp_port,
+                                 tracer_config=HttpClientTracerConfig())
     assert resp.status == 404
 
     resp = await app.client.get(span,
