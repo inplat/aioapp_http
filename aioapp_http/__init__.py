@@ -93,7 +93,7 @@ class Server(Component):
         self.uris = None
         self.handler = handler(self)
         self._sites: list = []
-        self._runner: web_runner.AppRunner = None
+        self._runner: Optional[web_runner.AppRunner] = None
 
     async def wrap_middleware(self, app, handler):
         async def middleware_handler(request: web.Request):
@@ -174,6 +174,8 @@ class Server(Component):
 
     async def prepare(self):
         self.app.log_info("Preparing to start http server")
+        if self._runner is None:
+            raise UserWarning()
         self._runner = web_runner.AppRunner(
             self.web_app,
             handle_signals=False,
@@ -202,7 +204,7 @@ class Server(Component):
 
     async def stop(self):
         self.app.log_info("Stopping http server")
-        if self._runner:
+        if self._runner is not None:
             await self._runner.cleanup()
 
     async def health(self, ctx: Span):
