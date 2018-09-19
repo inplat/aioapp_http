@@ -16,7 +16,7 @@ from aioapp.tracer import (Span, CLIENT, SERVER, HTTP_PATH, HTTP_METHOD,
                            HTTP_STATUS_CODE,
                            HTTP_URL, SPAN_TYPE, SPAN_KIND)
 
-__version__ = '0.0.1a2'
+__version__ = '0.0.1b1'
 
 SPAN_TYPE_HTTP = 'http'
 SPAN_KIND_HTTP_IN = 'in'
@@ -174,8 +174,6 @@ class Server(Component):
 
     async def prepare(self):
         self.app.log_info("Preparing to start http server")
-        if self._runner is None:
-            raise UserWarning()
         self._runner = web_runner.AppRunner(
             self.web_app,
             handle_signals=False,
