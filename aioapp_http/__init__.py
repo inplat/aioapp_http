@@ -242,8 +242,8 @@ class Client(Component):
         # TODO optional propagate tracing headers
         span = None
         if ctx:
-            headers.update(ctx.make_headers())
             span = ctx.new_child()
+            headers.update(span.make_headers())
         try:
             async with ClientSession(loop=self.loop,
                                      headers=headers,
