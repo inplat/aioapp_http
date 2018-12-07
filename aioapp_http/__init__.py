@@ -69,13 +69,17 @@ class Server(Component):
                  access_log=access_logger,
                  reuse_address=None, reuse_port=None,
 
-                 shutdown_timeout=60.0) -> None:
+                 shutdown_timeout=60.0,
+                 middlewares=None) -> None:
         if not issubclass(handler, Handler):
             raise UserWarning()
         super(Server, self).__init__()
+        if middlewares is None:
+            middlewares = []
+        middlewares += [self.wrap_middleware]
+
         self.web_app = web.Application(loop=self.loop,
-                                       middlewares=[
-                                           self.wrap_middleware, ])
+                                       middlewares=middlewares)
         self.host = host
         self.port = port
         self.error_handler = None
