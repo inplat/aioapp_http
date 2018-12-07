@@ -76,10 +76,9 @@ class Server(Component):
         super(Server, self).__init__()
         if middlewares is None:
             middlewares = []
-        middlewares += [self.wrap_middleware]
+        self.middlewares = middlewares + [self.wrap_middleware]
 
-        self.web_app = web.Application(loop=self.loop,
-                                       middlewares=middlewares)
+        self.web_app = None
         self.host = host
         self.port = port
         self.error_handler = None
@@ -162,6 +161,8 @@ class Server(Component):
             return resp, trace
 
     def add_route(self, method, uri, handler):
+        if self.web_app is None:
+            raise UserWarning('You must add routes in Handler.prepare')
         self.web_app.router.add_route(method, uri,
                                       partial(self._handle_request, handler))
 
@@ -174,13 +175,16 @@ class Server(Component):
 
     async def prepare(self):
         self.app.log_info("Preparing to start http server")
+        self.web_app = web.Application(loop=self.loop,
+                                       middlewares=self.middlewares)
+
+        await self.handler.prepare()
         self._runner = web_runner.AppRunner(
             self.web_app,
             handle_signals=False,
             access_log_class=self.access_log_class,
             access_log_format=self.access_log_format,
             access_log=self.access_log)
-        await self.handler.prepare()
         await self._runner.setup()
         self._sites = []
         self._sites.append(web_runner.TCPSite(

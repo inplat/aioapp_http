@@ -28,6 +28,8 @@ async def test_server(app, unused_tcp_port):
     class TestHandler(Handler):
         def __init__(self, server):
             super(TestHandler, self).__init__(server)
+
+        async def prepare(self):
             self.server.add_route('GET', '/ok', self.ok_handler)
             self.server.add_route('GET', '/fb', self.fb_handler)
 
