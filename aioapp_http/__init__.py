@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 from aiohttp import web, web_runner, ClientSession, hdrs, helpers
 from aiohttp import ClientResponse
 from aiohttp import TCPConnector
+from aiohttp.web_urldispatcher import ResourceRoute
 from aioapp.app import Component
 import logging
 from aioapp.tracer import (Span, CLIENT, SERVER, HTTP_PATH, HTTP_METHOD,
@@ -160,11 +161,12 @@ class Server(Component):
 
             return resp, trace
 
-    def add_route(self, method, uri, handler):
+    def add_route(self, method, uri, handler) -> 'ResourceRoute':
         if self.web_app is None:
             raise UserWarning('You must add routes in Handler.prepare')
-        self.web_app.router.add_route(method, uri,
-                                      partial(self._handle_request, handler))
+        return self.web_app.router.add_route(method, uri,
+                                             partial(self._handle_request,
+                                                     handler))
 
     def set_error_handler(self, handler):
         self.error_handler = handler
