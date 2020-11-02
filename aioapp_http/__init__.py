@@ -17,7 +17,7 @@ from aioapp.tracer import (Span, CLIENT, SERVER, HTTP_PATH, HTTP_METHOD,
                            HTTP_STATUS_CODE,
                            HTTP_URL, SPAN_TYPE, SPAN_KIND)
 
-__version__ = '0.0.1b6'
+__version__ = '0.0.1b7'
 
 SPAN_TYPE_HTTP = 'http'
 SPAN_KIND_HTTP_IN = 'in'
